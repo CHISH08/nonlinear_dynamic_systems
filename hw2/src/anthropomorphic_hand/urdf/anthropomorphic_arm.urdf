@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<robot name="anthropomorphic_arm">
+    <!-- ВИРТУАЛЬНЫЕ звенья для осей вращения -->
+    <!-- база -->
+    <link name="base_link"/>
+
+    <!-- Плечо -->
+    <link name="shoulder_x_link"/>
+    <link name="shoulder_y_link"/>
+
+    <!-- Кисть -->
+    <link name="wrist_x_link"/>
+    <link name="wrist_y_link"/>
+
+
+    <!-- Настоящее звено плеча -->
+    <link name="shoulder_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Настоящее звено плечевой кости -->
+    <link name="arm_link">
+        <visual>
+            <origin xyz="0 0 0.20" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.02" length="0.40"/>
+            </geometry>
+            <material name="green">
+                <color rgba="0 1 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Настоящее звено локтя -->
+    <link name="elbow_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 1.57 0"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.05"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Настоящее звено предплечья -->
+    <link name="forearm_link">
+        <visual>
+            <origin xyz="0 0 0.16" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.018" length="0.32"/>
+            </geometry>
+            <material name="green">
+                <color rgba="0 1 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Настоящее звено запястья -->
+    <link name="wrist_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="hand_link">
+    <visual>
+        <origin xyz="0 0 0.09" rpy="0 0 0"/>
+        <geometry>
+        <!-- размеры: X = ширина, Y = толщина, Z = длина -->
+        <box size="0.10 0.03 0.18"/>
+        </geometry>
+        <material name="green">
+        <color rgba="0 1 0 1"/>
+        </material>
+    </visual>
+    </link>
+
+
+    <!-- ========== Плечевое вращение (3 DOF) ========== -->
+    <!-- Первое вращение вокруг X -->
+    <joint name="shoulder_joint_x" type="revolute">
+        <parent link="base_link"/>
+        <child link="shoulder_x_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- Второе вращение вокруг Y -->
+    <joint name="shoulder_joint_y" type="revolute">
+        <parent link="shoulder_x_link"/>
+        <child link="shoulder_y_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- Третье вращение вокруг Z -->
+    <joint name="shoulder_joint_z" type="revolute">
+        <parent link="shoulder_y_link"/>
+        <child link="shoulder_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="-1.57" upper="1.57" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- ========== Прикрепляем плечевую кость к плечу (Fixed) ========== -->
+    <!-- Плечо -> Плечевая кость -->
+    <joint name="arm_joint" type="fixed">
+        <parent link="shoulder_link"/>
+        <child link="arm_link"/>
+        <!-- смещаем сустав на радиус сферы-плеча -->
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    </joint>
+
+    <!-- ========== Локтевое вращение (1 DOF) ========== -->
+    <joint name="elbow_joint" type="revolute">
+        <parent link="arm_link"/>
+        <child link="elbow_link"/>
+        <!-- смещаем сустав на длину плечевой кости+радиус -->
+        <origin xyz="0 0 0.43" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-3.0" upper="0" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- ========== Прикрепляем предплечье к локтю (Fixed) ========== -->
+    <!-- Предплечье -> Локоть -->
+    <joint name="forearm_joint" type="fixed">
+        <parent link="elbow_link"/>
+        <child link="forearm_link"/>
+        <!-- смещаем сустав на радиус сферы-плеча -->
+        <origin xyz="0 0 0.03" rpy="0 0 0"/>
+    </joint>
+
+    <!-- ========== Вращение запястья (3 DOF) ========== -->
+    <!-- Первое вращение вокруг X -->
+    <joint name="wrist_joint_x" type="revolute">
+        <parent link="forearm_link"/>
+        <child link="wrist_x_link"/>
+        <!-- сустав в конце предплечья -->
+        <origin xyz="0 0 0.32" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- Второе вращение вокруг Y -->
+    <joint name="wrist_joint_y" type="revolute">
+        <parent link="wrist_x_link"/>
+        <child link="wrist_y_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.57" upper="1.57" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- Третье вращение вокруг Z -->
+    <joint name="wrist_joint_z" type="revolute">
+        <parent link="wrist_y_link"/>
+        <child link="wrist_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="-1.57" upper="1.57" effort="10.0" velocity="1.0"/>
+    </joint>
+
+    <!-- ========== Прикрепляем кисть к запястью (Fixed) ========== -->
+    <joint name="hand_joint" type="fixed">
+        <parent link="wrist_link"/>
+        <child link="hand_link"/>
+        <!-- центр ладони совпадает с центром запястья -->
+        <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    </joint>
+</robot>
