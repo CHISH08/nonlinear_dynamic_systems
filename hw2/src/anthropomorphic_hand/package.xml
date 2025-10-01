@@ -3,6 +3,7 @@
   <name>anthropomorphic_hand</name>
   <version>0.0.1</version>
   <description>URDF for anthropomorphic hand</description>
+  <maintainer email="chish08@example.com">CHISH08</maintainer>
 
   <license>BSD</license>
 
